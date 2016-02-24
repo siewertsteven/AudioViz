@@ -13,8 +13,24 @@
         margin-left:10px;
         margin-top:10px;
         box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
-        background: black;
     }
+	
+	#Canvas {
+         position:absolute;
+         z-index: 0;
+         left: 10px;
+         top: 10px;
+         box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+      }
+      
+      #treeCanvas{
+		position: absolute;
+		left: 10px;
+		top: 10px;
+		z-index: 1;
+		cursor: pointer;
+	  
+	  }
       
       #controls{
       	margin-left:10px;
@@ -33,7 +49,7 @@
 		var SOUND_3 = 'media/RedSun.mp3';
 		var audioElement;
 		var analyserNode;
-		var canvas,ctx;
+		var canvas,ctx, treeCanvas, tctx;
 		var maxRadius = 50;
 		var invert = false, tintRed = false, noise=false, lines=false;
 		//images
@@ -41,9 +57,11 @@
 		
 		function init(){
 			// set up canvas stuff
-			canvas = document.querySelector('canvas');
+			canvas = document.querySelector("#canvas");
 			ctx = canvas.getContext("2d");
 			
+			treeCanvas = document.querySelector("#treeCanvas");
+			tctx = treeCanvas.getContext("2d");
 			
 			// get reference to <audio> element on page
 			audioElement = document.querySelector('audio');
@@ -179,6 +197,7 @@
 			
 			// DRAW!
 			ctx.clearRect(0,0,800,600);  
+			tctx.clearRect(0,0,800,600);  
 			var barWidth = 5;
 			var barSpacing = 1;
 			var barHeight = 100;
@@ -191,27 +210,28 @@
 			ctx.drawImage(stars, 0, 0, 960, 540);
 			
 			ctx.drawImage(sun, 0, 0, 960, 540);
-		
 			ctx.save();
 			ctx.globalCompositeOperation = "source-in";
 			ctx.fillStyle="yellow";
 			ctx.fillRect(0,0,960,540);
 			ctx.restore();
+		
 			
-			ctx.drawImage(tree, 0, 0, 960, 540);
+			tctx.drawImage(tree, 0, 0, 960, 540);
+			
 			
 
-			ctx.save();
-			ctx.globalCompositeOperation = "source-in";
-			ctx.fillStyle="red";
-			ctx.fillRect(0,0,960,540);
-			ctx.restore();
+			tctx.save();
+			tctx.globalCompositeOperation = "source-in";
+			tctx.fillStyle="blue";
+			tctx.fillRect(0,0,960,540);
+			tctx.restore();
 			
-			ctx.save();
-			ctx.globalCompositeOperation = "darken";
-			ctx.drawImage(tree, 0, 0, 960, 540);
-			ctx.restore();
-			
+			tctx.save();
+			tctx.globalCompositeOperation = "darken";
+			tctx.drawImage(tree, 0, 0, 960, 540);
+			tctx.restore();
+
 			
 			
 			manipulatePixels();
@@ -250,6 +270,7 @@
 </head>
 <body>
 	<canvas id="canvas" width="960" height="540"></canvas>
+	<canvas id="treeCanvas" width="960" height="540"></canvas>
 	<div id="controls">
 		<audio controls loop></audio>
 		<label>Track: 
