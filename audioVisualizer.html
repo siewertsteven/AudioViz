@@ -58,10 +58,12 @@
 		var frequency;
 		var audioElement;
 		var analyserNode;
+		var delayNode;
 		var canvas,ctx, treeCanvas, tctx, sunCanvas, sctx;
 		var maxRadius = 50;
 		var x1,y1,x2,y2,x3,y3,x4,y4,x5,y5,x6,y6,x7,y7,x8,y8;
 		var invert = false, tintRed = false, noise=false, lines=false;
+		var hawaiian = false;
 		//images
 		var stars, sun, tree;
 		
@@ -108,7 +110,7 @@
 			
 			// create an analyser node
 			analyserNode = audioCtx.createAnalyser();
-			
+			delayNode = audioCtx.createDelay(5,0);
 			/*
 			We will request NUM_SAMPLES number of samples or "bins" spaced equally 
 			across the sound spectrum.
@@ -123,7 +125,9 @@
 			
 			// this is where we hook up the <audio> element to the analyserNode
 			sourceNode = audioCtx.createMediaElementSource(audioElement); 
-			sourceNode.connect(analyserNode);
+			sourceNode.connect(delayNode);
+			
+			delayNode.connect(analyserNode);
 			
 			// here we connect to the destination i.e. speakers
 			analyserNode.connect(audioCtx.destination);
@@ -136,20 +140,20 @@
 			var width = imageData.width;
 			
 			for (var i=0; i<length -4; i+=4){
-			if(tintRed){
-					
-					data[i] = data[i] + 100;
-			}
-			if(invert){
+			if(hawaiian){
+			
+				data[i] = data[i] + 100;
+			
 				var red = data[i]
 				var green = data[i+1]
 				var blue = data[i+2];
 				data[i] = 255 - red;
 				data[i+1] = 255 - green;
 				data[i+2] = 255 - blue;
-			}
-			if (noise && Math.random()<.10){
+				
+				if (Math.random()<.10){
 				data[i] = data[i + 1] = data[i + 2] = 128;
+			}
 			}
 			
 			if (lines){
@@ -178,8 +182,8 @@
 				else{frequency=false;}
 			};
 			
-			document.querySelector("#radiusSlider").onchange = function(e){
-			  maxRadius = 50 + (e.target.value)/1; console.log(e.target.value);
+			document.querySelector("#delaySlider").onchange = function(e){
+			  delayNode.delayTime.value = e.target.value;
 			}
 			
 			document.querySelector("#fsButton").onclick = function(){
@@ -264,9 +268,6 @@
              analyserNode.getByteTimeDomainData(data);
             }
 		
-			// OR
-			//analyserNode.getByteTimeDomainData(data); // waveform data
-			
 			// DRAW!
 			ctx.clearRect(0,0,800,600);  
 			tctx.clearRect(0,0,800,600);
@@ -325,9 +326,7 @@
 			
 			manipulatePixels();
 			
-			invert = document.getElementById("invert").checked;
-			tintRed = document.getElementById("tintRed").checked;
-			noise = document.getElementById("noise").checked;
+			hawaiian = document.getElementById("hMode").checked;
 			lines = document.getElementById("lines").checked;
 		} 
 		
@@ -370,25 +369,24 @@
 				<option value="media/silverLights.mp3">Silver Lights</option>
 				<option value="media/horseSteppin.mp3">Horse Steppin</option>
 			</select>
-		</label>
-		<img src="media/Tree.png" id="palmTree" style="display:none;"></img>
-		<img src="media/Sun.png" id="sun" style="display:none;"></img>
-		<img src="media/Stars.png" id="stars" style="display:none;"></img>
-		<br>
-		<input type="range" name="circleRadius" id="radiusSlider">Radius Slider
-		<br>
-		<input type="checkbox" name="tint red" id="tintRed" >Red Tint
-		<input type="checkbox" name="invert" id="invert">Invert
-		<input type="checkbox" name="noise" id="noise">Noise
-		<input type="checkbox" name="lines" id="lines">Lines
-		<br>
-                        
+		</label>    
+		
         <label>Form: 
 			<select id="formChooser" >
 				<option value=1>Waveform</option>
 				<option value=2 selected>Frequency</option>
 			</select>
 		</label>
+		<img src="media/Tree.png" id="palmTree" style="display:none;"></img>
+		<img src="media/Sun.png" id="sun" style="display:none;"></img>
+		<img src="media/Stars.png" id="stars" style="display:none;"></img>
+		<br>
+		<input type="range" name="delay" min="0" max="3" value="0" step="0.1" id="delaySlider">Delay Slider
+		<br>
+		<input type="checkbox" name="hMode" id="hMode">Hawaiian Mode
+		<input type="checkbox" name="lines" id="lines">Lines
+		<br>
+       
 		
 		<button id="fsButton">Go Full Screen</button><br>
 		
