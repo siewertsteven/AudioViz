@@ -277,16 +277,7 @@
 			var barHeight = 100;
 			var topSpacing = 100;
 			
-			ctx.save();
-			ctx.fillStyle="black";
-			ctx.fillRect(0,0,960,540);
 			
-			var ggrd = ctx.createLinearGradient(0,430,0,540);
-			ggrd.addColorStop(0,makeColor(0,192,255,1));
-			ggrd.addColorStop(.5,makeColor(0,0,20,1));
-			ctx.fillStyle=ggrd;
-			ctx.fillRect(0,430, 940, 270);
-			ctx.restore();
 			
 			
 			// loop through the data and draw!
@@ -294,23 +285,48 @@
 					if(i%8 ==0)
 					{makeWaves(data, i);}
 			}
+			//drawing background
+			ctx.save();
+			ctx.fillStyle="black";
+			ctx.fillRect(0,0,960,540);
+			ctx.restore();
 			
+			//drawing ground
+			ctx.save();
+			var ggrd = ctx.createLinearGradient(0,430,0,540);
+			ggrd.addColorStop(0,makeColor(0,192,255,1));
+			ggrd.addColorStop(Math.max((data[1]/256), .2),makeColor(0,0,10,1));
+			ctx.fillStyle=ggrd;
+			ctx.fillRect(0,430, 960, 270);
+			ctx.restore();
+			
+			//halo behind the sun
+			ctx.save();
+			var hgrd = ctx.createRadialGradient(480, 300, 5, 480, 10, 550);
+			hgrd.addColorStop(0,makeColor(255,128,0,.5));
+			hgrd.addColorStop(Math.max((data[1]/256) - .5, .2),makeColor(255,0,0,.2));
+			hgrd.addColorStop(.7,makeColor(0,0,255,0));
+			hgrd.addColorStop(1,makeColor(0,0,0,0));
+			ctx.fillStyle = hgrd;
+			ctx.beginPath();
+			ctx.arc(480,300, 500, 0, 2*Math.PI);
+			ctx.fill();
+			ctx.restore();
+			
+			//drawing sun
 			sctx.drawImage(sun, 0, 0, 960, 540);
 			sctx.save();
 			sctx.globalCompositeOperation = "source-in";
 			var sgrd=ctx.createRadialGradient(480, 10, 5, 480, 10, 550);
 			sgrd.addColorStop(0,"yellow");
-			sgrd.addColorStop((data[data.length/2]/255) + .2 ,"orange");
-			sgrd.addColorStop(1,"pink");
+			sgrd.addColorStop((data[data.length/2]/255),"orange");
+			sgrd.addColorStop(.75,makeColor(255,128,1,0));
 			sctx.fillStyle=sgrd;
 			sctx.fillRect(0,0,960,540);
 			sctx.restore();
 		
 			
 			tctx.drawImage(tree, 0, 0, 960, 540);
-			
-			
-
 			tctx.save();
 			tctx.globalCompositeOperation = "source-in";
 			tctx.fillStyle = makeColor(Math.floor(data[1]/2), Math.floor(data[1]/2), data[1], 1);
