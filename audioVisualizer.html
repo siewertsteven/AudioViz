@@ -5,48 +5,44 @@
 	<title>Web Audio Visualizer</title>
 	<style>
 	body {
-         background: #eeeeee;
+	     width=100%;
+         background: black;
          font-family: tahoma, verdana, sans serif;
+		 color:white;
       }
+	  
+	#controls
+	  {
+	    width:200px;
+		display:block;
+		margin-top:10px;
+		padding:10px;
+	  }
 
-      canvas {
-        margin-left:10px;
-        margin-top:10px;
-        box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+    canvas {
+		width:960px;
+		display:block;
+		position:absolute;
+		left:0;
+		right:0;
+		margin-left: auto;
+		margin-right: auto;
     }
 	
 	#Canvas {
-         position:absolute;
          z-index: 0;
-         left: 10px;
-         top: 10px;
-         box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
       }
       
       #treeCanvas{
-		position: absolute;
-		left: 10px;
-		top: 10px;
 		z-index: 2;
-		cursor: pointer;
-	  
 	  }
 	  
 	  #sunCanvas{
-		position: absolute;
-		left: 10px;
-		top: 10px;
 		z-index: 1;
-		cursor: pointer;
 	  }
       
-      #controls{
-      	margin-left:10px;
-        margin-top:10px;
-      }
 	</style>
 	<script>
-	// An IIFE ("Iffy") - see the notes in mycourses
 	(function(){
 		"use strict";
 		
@@ -62,8 +58,9 @@
 		var canvas,ctx, treeCanvas, tctx, sunCanvas, sctx;
 		var maxRadius = 50;
 		var x1,y1,x2,y2,x3,y3,x4,y4,x5,y5,x6,y6,x7,y7,x8,y8;
-		var invert = false, tintRed = false, noise=false, lines=false;
+		var invert = false, tintRed = false, noise=false, lines=true;
 		var hawaiian = false;
+		var lightIntensity = .5;
 		//images
 		var stars, sun, tree;
 		
@@ -151,20 +148,9 @@
 				data[i+1] = 255 - green;
 				data[i+2] = 255 - blue;
 				
-				if (Math.random()<.10){
-				data[i] = data[i + 1] = data[i + 2] = 128;
+				
 			}
-			}
-			
-			if (lines){
-				var row = Math.floor(i/4/width);
-				if (row % 50 == 0){
-					data[i] = data[i+1] = data[i+2] = data[i+3] = 255;
-					
-					data[i+(width*4)] = data[i+(width*4)+1] = data[i+(width*4)+2]= data[i+(width*4)+3] = 255;
-				}
-			
-			}
+
 			}
 	
 			
@@ -184,6 +170,10 @@
 			
 			document.querySelector("#delaySlider").onchange = function(e){
 			  delayNode.delayTime.value = e.target.value;
+			}
+			
+			document.querySelector("#sunSlider").onchange = function(e){
+				lightIntensity = e.target.value;
 			}
 			
 			document.querySelector("#fsButton").onclick = function(){
@@ -305,8 +295,10 @@
 			//halo behind the sun
 			ctx.save();
 			var hgrd = ctx.createRadialGradient(480, 300, 5, 480, 10, 550);
-			hgrd.addColorStop(0,makeColor(255,128,0,.5));
-			hgrd.addColorStop(Math.max((data[1]/256) - .5, .2),makeColor(255,0,0,.2));
+			
+
+			hgrd.addColorStop(0,makeColor(255,128,0, lightIntensity));
+			hgrd.addColorStop(Math.max((data[1]/256) - .5, .2),makeColor(255,0,0,lightIntensity - .2));
 			hgrd.addColorStop(.7,makeColor(0,0,255,0));
 			hgrd.addColorStop(1,makeColor(0,0,0,0));
 			ctx.fillStyle = hgrd;
@@ -317,7 +309,7 @@
 			
 			if(waves==true)
 			{
-				// loop through the data and draw!
+				
 				for(var i=0; i<data.length - 4; i = i + 4) { 
 						if(i%8 ==0)
 						{makeWaves(data, i);}
@@ -325,32 +317,53 @@
 			}
 			
 			//drawing sun
+
 			sctx.drawImage(sun, 0, 0, 960, 540);
 			sctx.save();
 			sctx.globalCompositeOperation = "source-in";
 			var sgrd=ctx.createRadialGradient(480, 10, 5, 480, 10, 550);
 			sgrd.addColorStop(0,"yellow");
-			sgrd.addColorStop((data[data.length/2]/255),"orange");
-			sgrd.addColorStop(.75,makeColor(255,128,1,0));
+			sgrd.addColorStop((data[data.length/2]/255) ,"orange");
+			sgrd.addColorStop(1,makeColor(255,0,255,lightIntensity - .5));
 			sctx.fillStyle=sgrd;
 			sctx.fillRect(0,0,960,540);
 			sctx.restore();
 		
-			
+			//drawing tree
 			tctx.drawImage(tree, 0, 0, 960, 540);
 			tctx.save();
 			tctx.globalCompositeOperation = "source-in";
-			tctx.fillStyle = makeColor(Math.floor(data[1]/2), Math.floor(data[1]/2), data[1], 1);
-			tctx.fillRect(0,0,960,540);
+			tctx.fillStyle = makeColor(Math.floor(data[1]/3), Math.floor(data[1]/3), data[1], 1);
+			tctx.fillRect(0,0,800,540);
 			tctx.restore();
 			
 			tctx.save();
 			tctx.globalCompositeOperation = "darken";
 			tctx.drawImage(tree, 0, 0, 960, 540);
 			tctx.restore();
+			
+			//scan lines
+			tctx.save();
+			tctx.lineWidth=5;
+			tctx.strokeStyle=makeColor(0,0,0,.3);
+			if (lines){
+				for(var i=0; i<treeCanvas.height; i++){
+				 
+					if (i%7 == 0){
+						tctx.beginPath();
+						tctx.moveTo(0,i);
+						tctx.lineTo(treeCanvas.width, i);
+						tctx.stroke();
+						tctx.fill();
+						
+					}	
+				}
+			}
+			tctx.restore();
+			
 
 			
-			
+			//changing color
 			manipulatePixels();
 			
 			hawaiian = document.getElementById("hMode").checked;
@@ -390,6 +403,8 @@
 	<canvas id="sunCanvas" width="960" height="540"></canvas>
 	<div id="controls">
 		<audio controls loop></audio>
+		<br>
+		<br>
 		<label>Track: 
 			<select id="trackSelect" >
 				<option value="media/hydrogen.mp3">Hydrogen</option>
@@ -398,21 +413,31 @@
 				<option value="media/horseSteppin.mp3">Horse Steppin</option>
 			</select>
 		</label>    
-		
+		<br>
+		<br>
         <label>Form: 
 			<select id="formChooser" >
 				<option value=1>Waveform</option>
 				<option value=2 selected>Frequency</option>
 			</select>
 		</label>
+		<br>
 		<img src="media/Tree.png" id="palmTree" style="display:none;"></img>
 		<img src="media/Sun.png" id="sun" style="display:none;"></img>
 		<img src="media/Stars.png" id="stars" style="display:none;"></img>
 		<br>
-		<input type="range" name="delay" min="0" max="3" value="0" step="0.1" id="delaySlider">Delay Slider
+		Delay Slider
+		<input type="range" name="delay" min="0" max="3" value="0" step="0.1" id="delaySlider">
 		<br>
+		Sun Intensity
+		<input type="range" name="sunI" min="0" max="1" value=".5" step="0.05" id="sunSlider">
+		<br>
+		
+		
 		<input type="checkbox" name="hMode" id="hMode">Hawaiian Mode
-		<input type="checkbox" name="lines" id="lines">Lines
+		<br>
+		<input type="checkbox" name="lines" id="lines" checked>Scan Lines
+		<br>
 		<input type="checkbox" name="waves" id="waves" checked>Waves
 		<br>
        
