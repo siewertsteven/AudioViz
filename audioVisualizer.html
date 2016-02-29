@@ -195,21 +195,23 @@
 		function makeWaves( data, i)
 		{
                 x1 = canvas.width / 16;
-                y1 = data[i] +230;
                 x2 = canvas.width / 8;
-                y2 = (canvas.height - data[i])*1.25;
 				x3 = canvas.width / 4 ;
-                y3 = (canvas.height - data[i])*1.25;
                 x4 = canvas.width / 2;
-                y4 = data[i]+270;
 				x5 = canvas.width / 2;
-                y5 = data[i]+270;
                 x6 = canvas.width - canvas.width / 4;
-                y6 = (canvas.height - data[i])*1.25;
 				x7 = canvas.width - canvas.width / 8;
-                y7 = (canvas.height - data[i])*1.25;
                 x8 = canvas.width - canvas.width / 16;
-                y8 = data[i]+230;
+
+				y1 = data[i] +240;
+				y2 = (canvas.height - data[i])*1.25;
+				y3 = (canvas.height - data[i])*1.25;
+				y4 = data[i]+270;
+				y5 = data[i]+270;
+				y6 = (canvas.height - data[i])*1.25;
+				y7 = (canvas.height - data[i])*1.25;
+				y8 = data[i]+240;
+
 				
 				
                 ctx.strokeStyle = "blue";
@@ -236,6 +238,10 @@
                 ctx.moveTo(canvas.width-canvas.width/4, canvas.height-60);
                 ctx.bezierCurveTo(x7, y7, x8, y8, canvas.width, canvas.height);
                 ctx.stroke();
+				
+				ctx.moveTo(canvas.width/2, canvas.height)
+				ctx.lineTo(canvas.width/2, canvas.height-100)
+				ctx.stroke();
 		}
 		
 		function playStream(audioElement,path){
@@ -309,10 +315,13 @@
 			ctx.fill();
 			ctx.restore();
 			
-			// loop through the data and draw!
-			for(var i=0; i<data.length - 4; i = i + 4) { 
-					if(i%8 ==0)
-					{makeWaves(data, i);}
+			if(waves==true)
+			{
+				// loop through the data and draw!
+				for(var i=0; i<data.length - 4; i = i + 4) { 
+						if(i%8 ==0)
+						{makeWaves(data, i);}
+				}
 			}
 			
 			//drawing sun
@@ -346,6 +355,7 @@
 			
 			hawaiian = document.getElementById("hMode").checked;
 			lines = document.getElementById("lines").checked;
+			waves = document.getElementById("waves").checked;
 		} 
 		
 		// HELPER
@@ -403,6 +413,7 @@
 		<br>
 		<input type="checkbox" name="hMode" id="hMode">Hawaiian Mode
 		<input type="checkbox" name="lines" id="lines">Lines
+		<input type="checkbox" name="waves" id="waves" checked>Waves
 		<br>
        
 		
