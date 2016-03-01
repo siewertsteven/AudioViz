@@ -3,6 +3,7 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Web Audio Visualizer</title>
+	<link rel="stylesheet" href="font/stylesheet.css" type="text/css" charset="utf-8" />
 	<style>
 	body {
 	     width=100%;
@@ -10,7 +11,12 @@
          font-family: tahoma, verdana, sans serif;
 		 color:white;
       }
-	  
+	header{
+		font-family: 'shoguns_clanregular';
+		color:hotpink;
+		font-size: 3.5em;
+		margin:auto;
+	}
 	#controls
 	  {
 	    width:200px;
@@ -398,6 +404,7 @@
 	</script>
 </head>
 <body>
+	<header>Audio Visualizer</header>
 	<canvas id="canvas" width="960" height="540"></canvas>
 	<canvas id="treeCanvas" width="960" height="540"></canvas>
 	<canvas id="sunCanvas" width="960" height="540"></canvas>
