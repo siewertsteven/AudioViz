@@ -7,7 +7,7 @@
 	<style>
 	body {
 	     width=100%;
-         background: black;
+         background: RGB(10,0,20);
          font-family: tahoma, verdana, sans serif;
 		 color:white;
       }
@@ -37,6 +37,7 @@
 	
 	#Canvas {
          z-index: 0;
+		 box-shadow: 20px; 20px; 20px; rgb(10,0,20);
       }
       
       #treeCanvas{
@@ -62,7 +63,6 @@
 		var analyserNode;
 		var delayNode;
 		var canvas,ctx, treeCanvas, tctx, sunCanvas, sctx;
-		var maxRadius = 50;
 		var x1,y1,x2,y2,x3,y3,x4,y4,x5,y5,x6,y6,x7,y7,x8,y8;
 		var invert = false, tintRed = false, noise=false, lines=true;
 		var hawaiian = false;
@@ -291,10 +291,6 @@
 			ctx.clearRect(0,0,800,600);  
 			tctx.clearRect(0,0,800,600);
 			sctx.clearRect(0,0,800,600);
-			var barWidth = 5;
-			var barSpacing = 1;
-			var barHeight = 100;
-			var topSpacing = 100;
 			
 			drawBackground(data);
 			
@@ -323,7 +319,7 @@
 			//drawing scan lines
 			tctx.save();
 			tctx.lineWidth=5;
-			tctx.strokeStyle=makeColor(0,0,0,.3);
+			tctx.strokeStyle=makeColor(10,0,20,.3);
 				for(var i=0; i<treeCanvas.height; i++){
 				 
 					if (i%7 == 0){
@@ -356,7 +352,7 @@
 		function drawBackground(data){
 			//drawing background
 			ctx.save();
-			ctx.fillStyle="black";
+			ctx.fillStyle=makeColor(10, 0, 20, 1);
 			ctx.fillRect(0,0,960,540);
 			ctx.restore();
 			
@@ -364,7 +360,7 @@
 			ctx.save();
 			var ggrd = ctx.createLinearGradient(0,430,0,540);
 			ggrd.addColorStop(0,makeColor(0,192,255,1));
-			ggrd.addColorStop(Math.max((data[1]/256), .2),makeColor(0,0,10,1));
+			ggrd.addColorStop(Math.max((data[1]/256), .2),makeColor(10,0,20,1));
 			ctx.fillStyle=ggrd;
 			ctx.fillRect(0,430, 960, 270);
 			ctx.restore();
@@ -377,7 +373,7 @@
 			hgrd.addColorStop(0,makeColor(255,128,0, lightIntensity));
 			hgrd.addColorStop(Math.max((data[1]/256) - .5, .2),makeColor(255,0,0,lightIntensity - .2));
 			hgrd.addColorStop(.7,makeColor(0,0,255,0));
-			hgrd.addColorStop(1,makeColor(0,0,0,0));
+			hgrd.addColorStop(1,makeColor(10,0,20,0));
 			ctx.fillStyle = hgrd;
 			ctx.beginPath();
 			ctx.arc(480,300, 500, 0, 2*Math.PI);
@@ -393,7 +389,7 @@
 			var sgrd=ctx.createRadialGradient(480, 10, 5, 480, 10, 550);
 			sgrd.addColorStop(0,"yellow");
 			sgrd.addColorStop((data[data.length/2]/255) ,"orange");
-			sgrd.addColorStop(1,makeColor(255,0,255,lightIntensity - .5));
+			sgrd.addColorStop(1,makeColor(10,0,20,lightIntensity - .5));
 			sctx.fillStyle=sgrd;
 			sctx.fillRect(0,0,960,540);
 			sctx.restore();
