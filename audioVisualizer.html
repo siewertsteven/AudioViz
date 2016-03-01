@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>Web Audio Visualizer</title>
+	<title>Web Audio Visualizer - Steven and Stefen</title>
 	<link rel="stylesheet" href="font/stylesheet.css" type="text/css" charset="utf-8" />
 	<style>
 	body {
@@ -69,6 +69,10 @@
 		var lightIntensity = .5;
 		//images
 		var stars, sun, tree;
+		//tree colors
+		var tRed=1;
+		var tGreen=1;
+		var tBlue=3;
 		
 		function init(){
 			// set up canvas stuff
@@ -145,7 +149,8 @@
 			for (var i=0; i<length -4; i+=4){
 			if(hawaiian){
 			
-				data[i] = data[i] + 100;
+				data[i] = data[i + 1] + 100;
+				data[i] = data[i + 2] + 100;
 			
 				var red = data[i]
 				var green = data[i+1]
@@ -181,6 +186,18 @@
 			document.querySelector("#sunSlider").onchange = function(e){
 				lightIntensity = e.target.value;
 			}
+			
+			document.querySelector("#redSlider").onchange = function(e){
+				tRed = e.target.value;
+			}
+			
+			document.querySelector("#greenSlider").onchange = function(e){
+				tGreen = e.target.value;
+			}
+			document.querySelector("#blueSlider").onchange = function(e){
+				tBlue = e.target.value;
+			}
+			
 			
 			document.querySelector("#fsButton").onclick = function(){
 				requestFullscreen(canvas);
@@ -270,7 +287,7 @@
              analyserNode.getByteTimeDomainData(data);
             }
 		
-			// DRAW!
+			//clearing all the canvases
 			ctx.clearRect(0,0,800,600);  
 			tctx.clearRect(0,0,800,600);
 			sctx.clearRect(0,0,800,600);
@@ -279,10 +296,64 @@
 			var barHeight = 100;
 			var topSpacing = 100;
 			
+			drawBackground(data);
+			
+			if(waves==true)
+			{
+				
+				for(var i=0; i<data.length - 4; i = i + 4) { 
+						if(i%8 ==0)
+						{makeWaves(data, i);}
+				}
+			}
 			
 			
+			drawSun(data);
+			drawTree(data);
+			if(lines){drawScanLines(data);}
 			
+			//changing color
+			manipulatePixels();
 			
+			hawaiian = document.getElementById("hMode").checked;
+			lines = document.getElementById("lines").checked;
+			waves = document.getElementById("waves").checked;
+		}
+		function drawScanLines(data){
+			//drawing scan lines
+			tctx.save();
+			tctx.lineWidth=5;
+			tctx.strokeStyle=makeColor(0,0,0,.3);
+				for(var i=0; i<treeCanvas.height; i++){
+				 
+					if (i%7 == 0){
+						tctx.beginPath();
+						tctx.moveTo(0,i);
+						tctx.lineTo(treeCanvas.width, i);
+						tctx.stroke();
+						tctx.fill();
+						
+					}	
+				}
+			tctx.restore();
+		}
+		
+		function drawTree(data){
+			//drawing tree
+			tctx.drawImage(tree, 0, 0, 960, 540);
+			tctx.save();
+			tctx.globalCompositeOperation = "source-in";
+			tctx.fillStyle = makeColor(Math.floor((data[1] * tRed)/5), Math.floor((data[1] * tGreen)/5), Math.floor((data[1] * tBlue)/5), 1);
+			tctx.fillRect(0,0,800,540);
+			tctx.restore();
+			
+			tctx.save();
+			tctx.globalCompositeOperation = "darken";
+			tctx.drawImage(tree, 0, 0, 960, 540);
+			tctx.restore();
+		}
+		
+		function drawBackground(data){
 			//drawing background
 			ctx.save();
 			ctx.fillStyle="black";
@@ -312,18 +383,10 @@
 			ctx.arc(480,300, 500, 0, 2*Math.PI);
 			ctx.fill();
 			ctx.restore();
-			
-			if(waves==true)
-			{
-				
-				for(var i=0; i<data.length - 4; i = i + 4) { 
-						if(i%8 ==0)
-						{makeWaves(data, i);}
-				}
-			}
-			
-			//drawing sun
+		}
 
+		function drawSun(data){
+			//drawing sun
 			sctx.drawImage(sun, 0, 0, 960, 540);
 			sctx.save();
 			sctx.globalCompositeOperation = "source-in";
@@ -334,48 +397,7 @@
 			sctx.fillStyle=sgrd;
 			sctx.fillRect(0,0,960,540);
 			sctx.restore();
-		
-			//drawing tree
-			tctx.drawImage(tree, 0, 0, 960, 540);
-			tctx.save();
-			tctx.globalCompositeOperation = "source-in";
-			tctx.fillStyle = makeColor(Math.floor(data[1]/3), Math.floor(data[1]/3), data[1], 1);
-			tctx.fillRect(0,0,800,540);
-			tctx.restore();
-			
-			tctx.save();
-			tctx.globalCompositeOperation = "darken";
-			tctx.drawImage(tree, 0, 0, 960, 540);
-			tctx.restore();
-			
-			//scan lines
-			tctx.save();
-			tctx.lineWidth=5;
-			tctx.strokeStyle=makeColor(0,0,0,.3);
-			if (lines){
-				for(var i=0; i<treeCanvas.height; i++){
-				 
-					if (i%7 == 0){
-						tctx.beginPath();
-						tctx.moveTo(0,i);
-						tctx.lineTo(treeCanvas.width, i);
-						tctx.stroke();
-						tctx.fill();
-						
-					}	
-				}
-			}
-			tctx.restore();
-			
-
-			
-			//changing color
-			manipulatePixels();
-			
-			hawaiian = document.getElementById("hMode").checked;
-			lines = document.getElementById("lines").checked;
-			waves = document.getElementById("waves").checked;
-		} 
+		}
 		
 		// HELPER
 		function makeColor(red, green, blue, alpha){
@@ -447,7 +469,19 @@
 		<br>
 		<input type="checkbox" name="waves" id="waves" checked>Waves
 		<br>
-       
+		<br>
+		<b>Tree Color</b>
+		<br>
+		<br>
+		Red
+		<input type="range" name="treeRed" min="0" max="5" value="1" step=".01" id="redSlider">
+		<br>
+		Green
+		<input type="range" name="treeGreen" min="0" max="5" value="1" step=".01" id="greenSlider">
+		<br>
+		Blue
+		<input type="range" name="treeBlue" min="0" max="5" value="3" step=".01" id="blueSlider">
+		<br>
 		
 		<button id="fsButton">Go Full Screen</button><br>
 		

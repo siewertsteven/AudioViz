@@ -6,8 +6,6 @@
     font-family: 'shoguns_clanregular';
     src: url('shoguns_clan.eot');
     src: url('shoguns_clan.eot?#iefix') format('embedded-opentype'),
-         url('shoguns_clan.woff2') format('woff2'),
-         url('shoguns_clan.woff') format('woff'),
          url('shoguns_clan.ttf') format('truetype'),
          url('shoguns_clan.svg#shoguns_clanregular') format('svg');
     font-weight: normal;
